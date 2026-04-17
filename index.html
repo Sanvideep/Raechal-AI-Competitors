@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raechal.ai — Competitive Battlecard 2026</title>
+<style>
+  :root {
+    --bg-primary: #0a0d14;
+    --bg-elevated: #0f131c;
+    --bg-surface: #161b28;
+    --bg-hover: #1e2536;
+    --bg-card: #111827;
+    --border: rgba(255,255,255,0.08);
+    --border-accent: rgba(99,102,241,0.4);
+    --text-primary: #f1f5f9;
+    --text-secondary: rgba(241,245,249,0.7);
+    --text-muted: rgba(241,245,249,0.45);
+    --accent: #6366f1;
+    --accent-light: #818cf8;
+    --accent-hover: #4f46e5;
+    --you-win: #10b981;
+    --you-win-bg: rgba(16,185,129,0.12);
+    --they-win: #f87171;
+    --they-win-bg: rgba(248,113,113,0.1);
+    --tie: #fbbf24;
+    --tie-bg: rgba(251,191,36,0.1);
+    --tag-bg: rgba(99,102,241,0.15);
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #0f131c 0%, #161b28 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .header-left h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--text-primary);
+  }
+
+  .header-left h1 span { color: var(--accent-light); }
+
+  .header-left p {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  .header-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    background: var(--tag-bg);
+    border: 1px solid var(--border-accent);
+    color: var(--accent-light);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    padding: 16px 40px 0;
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.18s ease;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  }
+
+  .tab-btn:hover {
+    color: var(--text-secondary);
+    background: var(--bg-hover);
+  }
+
+  .tab-btn.active {
+    color: var(--accent-light);
+    border-bottom-color: var(--accent);
+    background: rgba(99,102,241,0.07);
+  }
+
+  /* CONTENT */
+  .content {
+    padding: 32px 40px;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* SECTION HEADINGS */
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+
+  .section-sub {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  @media (max-width: 900px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .content { padding: 20px; }
+    .header { padding: 20px; }
+    .tabs { padding: 12px 20px 0; }
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: border-color 0.18s;
+  }
+
+  .card:hover { border-color: rgba(99,102,241,0.25); }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  /* WIN/LOSS PILL */
+  .pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .pill-win { background: var(--you-win-bg); color: var(--you-win); }
+  .pill-lose { background: var(--they-win-bg); color: var(--they-win); }
+  .pill-tie { background: var(--tie-bg); color: var(--tie); }
+
+  /* COMPARISON TABLE */
+  .matrix-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 32px;
+    font-size: 13px;
+  }
+
+  .matrix-table th {
+    background: var(--bg-surface);
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+  }
+
+  .matrix-table th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+  .matrix-table th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
+
+  .matrix-table th.you { color: var(--accent-light); }
+
+  .matrix-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .matrix-table tr:last-child td { border-bottom: none; }
+
+  .matrix-table tr:hover td { background: var(--bg-hover); }
+
+  .matrix-table td:first-child {
+    color: var(--text-secondary);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .matrix-table td.you { color: var(--you-win); font-weight: 500; }
+  .matrix-table td.partial { color: var(--tie); }
+  .matrix-table td.no { color: var(--they-win); }
+
+  .check { color: var(--you-win); }
+  .cross { color: var(--they-win); }
+  .partial-mark { color: var(--tie); }
+
+  /* BATTLECARD LAYOUT */
+  .battlecard-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .comp-name {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  .comp-tagline {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  .comp-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .meta-tag {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+  /* WIN/LOSE COLUMNS */
+  .win-lose-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 700px) {
+    .win-lose-grid { grid-template-columns: 1fr; }
+  }
+
+  .win-box {
+    background: var(--you-win-bg);
+    border: 1px solid rgba(16,185,129,0.25);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+
+  .win-box h4 {
+    color: var(--you-win);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 12px;
+  }
+
+  .lose-box {
+    background: var(--they-win-bg);
+    border: 1px solid rgba(248,113,113,0.2);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+
+  .lose-box h4 {
+    color: var(--they-win);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 12px;
+  }
+
+  .point-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .point-list li {
+    font-size: 13px;
+    color: var(--text-secondary);
+    padding-left: 18px;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .point-list li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--text-muted);
+    font-size: 11px;
+    top: 1px;
+  }
+
+  /* TALK TRACKS */
+  .talk-track {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .talk-track-header {
+    padding: 13px 18px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .talk-track-header:hover { background: var(--bg-hover); }
+
+  .talk-track-body {
+    padding: 0 18px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
+
+  .talk-track-body.open {
+    max-height: 600px;
+    padding: 0 18px 16px;
+  }
+
+  .talk-track-body p {
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.65;
+    margin-bottom: 10px;
+  }
+
+  .scenario-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--accent-light);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .chevron {
+    transition: transform 0.25s;
+    color: var(--text-muted);
+    font-size: 16px;
+  }
+
+  .chevron.open { transform: rotate(180deg); }
+
+  /* OBJECTIONS TABLE */
+  .obj-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13px;
+  }
+
+  .obj-table th {
+    background: var(--bg-surface);
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .obj-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
+
+  .obj-table tr:last-child td { border-bottom: none; }
+  .obj-table tr:hover td { background: var(--bg-hover); }
+  .obj-table td:first-child { color: var(--they-win); font-style: italic; width: 40%; }
+  .obj-table td:last-child { color: var(--text-primary); }
+
+  /* LANDMINES */
+  .landmine-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .landmine {
+    background: rgba(251,191,36,0.07);
+    border: 1px solid rgba(251,191,36,0.2);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .landmine strong {
+    color: var(--tie);
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  /* PRICING BLOCK */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .pricing-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+
+  .pricing-card .tier {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .pricing-card .price {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+
+  .pricing-card .price-note {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .pricing-trap {
+    background: rgba(248,113,113,0.08);
+    border: 1px solid rgba(248,113,113,0.2);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .pricing-trap strong { color: var(--they-win); }
+
+  /* RAECHAL DIFFERENTIATORS */
+  .diff-card {
+    background: linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(99,102,241,0.04) 100%);
+    border: 1px solid var(--border-accent);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+
+  .diff-card h4 {
+    color: var(--accent-light);
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .diff-card p {
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .diff-card .proof {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* QUICK SUMMARY CARDS */
+  .summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+
+  .summary-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+
+  .summary-card:hover {
+    border-color: var(--border-accent);
+    transform: translateY(-1px);
+  }
+
+  .summary-card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .summary-card p {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .summary-card .verdict {
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+
+  /* SPACER */
+  .mt-6 { margin-top: 6px; }
+  .mt-12 { margin-top: 12px; }
+  .mt-20 { margin-top: 20px; }
+  .mt-24 { margin-top: 24px; }
+  .mb-20 { margin-bottom: 20px; }
+
+  /* FOOTER */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 60px;
+  }
+
+  .footer p { font-size: 12px; color: var(--text-muted); }
+
+  /* ALERT BOX */
+  .alert {
+    background: rgba(99,102,241,0.08);
+    border: 1px solid rgba(99,102,241,0.25);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+
+  .alert strong { color: var(--accent-light); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <h1><span>Raechal.ai</span> — Competitive Battlecard</h1>
+    <p>Updated April 18, 2026 &nbsp;·&nbsp; AI-Powered SEO + GEO Platform</p>
+  </div>
+  <div class="header-badges">
+    <span class="badge">vs Alli AI</span>
+    <span class="badge">vs Writesonic</span>
+    <span class="badge">vs Semrush / Adobe</span>
+    <span class="badge">vs Profound</span>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('matrix', this)">📊 Overview Matrix</button>
+  <button class="tab-btn" onclick="switchTab('raechal', this)">✦ Raechal.ai</button>
+  <button class="tab-btn" onclick="switchTab('alliai', this)">Alli AI</button>
+  <button class="tab-btn" onclick="switchTab('writesonic', this)">Writesonic</button>
+  <button class="tab-btn" onclick="switchTab('semrush', this)">Semrush / Adobe</button>
+  <button class="tab-btn" onclick="switchTab('profound', this)">Profound</button>
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB: MATRIX -->
+<!-- ================================================================ -->
+<div class="content">
+<div id="matrix" class="tab-panel active">
+
+  <div class="section-title">Head-to-Head Comparison</div>
+  <div class="section-sub">How Raechal.ai stacks up against each major competitor across key buying criteria.</div>
+
+  <div class="summary-cards">
+    <div class="summary-card" onclick="switchTab('alliai', document.querySelector('[onclick*=alliai]'))">
+      <h3>Alli AI</h3>
+      <p>Bulk SEO deployment, agency-focused. No GEO. Expensive entry point.</p>
+      <div class="verdict">
+        <span class="pill pill-win">You Win</span>
+        <span style="color:var(--text-muted);font-weight:400">on GEO + accessibility</span>
+      </div>
+    </div>
+    <div class="summary-card" onclick="switchTab('writesonic', document.querySelector('[onclick*=writesonic]'))">
+      <h3>Writesonic</h3>
+      <p>All-in-one AI writing + GEO tracking. Strong brand. No automation.</p>
+      <div class="verdict">
+        <span class="pill pill-win">You Win</span>
+        <span style="color:var(--text-muted);font-weight:400">on implementation</span>
+      </div>
+    </div>
+    <div class="summary-card" onclick="switchTab('semrush', document.querySelector('[onclick*=semrush]'))">
+      <h3>Semrush / Adobe</h3>
+      <p>Enterprise incumbent, bolt-on GEO, $1.9B acquisition. Complex + expensive.</p>
+      <div class="verdict">
+        <span class="pill pill-win">You Win</span>
+        <span style="color:var(--text-muted);font-weight:400">on simplicity + price</span>
+      </div>
+    </div>
+    <div class="summary-card" onclick="switchTab('profound', document.querySelector('[onclick*=profound]'))">
+      <h3>Profound</h3>
+      <p>Best-in-class enterprise GEO tracking. No SEO. Not SMB-friendly.</p>
+      <div class="verdict">
+        <span class="pill pill-win">You Win</span>
+        <span style="color:var(--text-muted);font-weight:400">on breadth + price</span>
+      </div>
+    </div>
+  </div>
+
+  <table class="matrix-table">
+    <thead>
+      <tr>
+        <th>Capability</th>
+        <th class="you">Raechal.ai</th>
+        <th>Alli AI</th>
+        <th>Writesonic</th>
+        <th>Semrush / Adobe</th>
+        <th>Profound</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>AI SEO Audit</td>
+        <td class="you">✅ Full audit</td>
+        <td>✅ Full audit</td>
+        <td class="partial">⚠️ Basic</td>
+        <td>✅ Deep audit</td>
+        <td class="no">❌ None</td>
+      </tr>
+      <tr>
+        <td>Automated Implementation</td>
+        <td class="you">✅ AI applies fixes<br><small style="color:var(--you-win);opacity:0.8">(you approve)</small></td>
+        <td>✅ Bulk deploy</td>
+        <td class="no">❌ Recs only</td>
+        <td class="no">❌ Insights only</td>
+        <td class="no">❌ None</td>
+      </tr>
+      <tr>
+        <td>GEO / AI Visibility Tracking</td>
+        <td class="you">✅ ChatGPT, Claude, Perplexity</td>
+        <td class="no">❌ None</td>
+        <td>✅ 10+ engines <small>(Pro $249/mo)</small></td>
+        <td class="partial">⚠️ Add-on cost</td>
+        <td>✅ 10+ engines <small>(Growth+ only)</small></td>
+      </tr>
+      <tr>
+        <td>Core Web Vitals / Technical SEO</td>
+        <td class="you">✅ Yes</td>
+        <td>✅ Yes</td>
+        <td class="partial">⚠️ Limited</td>
+        <td>✅ Deep</td>
+        <td class="no">❌ None</td>
+      </tr>
+      <tr>
+        <td>Backlink Analysis</td>
+        <td class="you">✅ Yes</td>
+        <td class="partial">⚠️ Basic</td>
+        <td class="partial">⚠️ Via integrations</td>
+        <td>✅ Industry-best</td>
+        <td class="no">❌ None</td>
+      </tr>
+      <tr>
+        <td>Content Creation / Writing</td>
+        <td class="partial">⚠️ Content updates</td>
+        <td class="no">❌ None</td>
+        <td>✅ AI Article Writer</td>
+        <td class="partial">⚠️ Limited</td>
+        <td class="partial">⚠️ AI-optimized recs</td>
+      </tr>
+      <tr>
+        <td>Broken Link & Redirect Management</td>
+        <td class="you">✅ Automated</td>
+        <td class="partial">⚠️ Partial</td>
+        <td class="no">❌ None</td>
+        <td>✅ Yes</td>
+        <td class="no">❌ None</td>
+      </tr>
+      <tr>
+        <td>Free Plan Available</td>
+        <td class="you">✅ Yes</td>
+        <td class="no">❌ Trial only</td>
+        <td class="partial">⚠️ Trial only</td>
+        <td class="no">❌ No</td>
+        <td class="no">❌ $99/mo min</td>
+      </tr>
+      <tr>
+        <td>No SEO Knowledge Required</td>
+        <td class="you">✅ Designed for this</td>
+        <td class="no">❌ Technical users</td>
+        <td class="partial">⚠️ Moderate</td>
+        <td class="no">❌ Complex</td>
+        <td class="no">❌ Enterprise ops</td>
+      </tr>
+      <tr>
+        <td>Entry Price</td>
+        <td class="you">Free</td>
+        <td class="no">$299/mo</td>
+        <td>$49/mo <small>(no GEO)</small></td>
+        <td class="no">$130/mo+</td>
+        <td class="no">$99/mo <small>(limited)</small></td>
+      </tr>
+      <tr>
+        <td>SMB / Non-expert friendly</td>
+        <td class="you">✅ Primary focus</td>
+        <td class="no">❌ Agency-centric</td>
+        <td class="partial">⚠️ Marketer-focused</td>
+        <td class="no">❌ Enterprise</td>
+        <td class="no">❌ Enterprise only</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title mt-24">Quick Win/Loss Guide</div>
+  <div class="section-sub">When Raechal.ai wins and when to watch out.</div>
+
+  <div class="win-lose-grid">
+    <div class="win-box">
+      <h4>🟢 You Win When…</h4>
+      <ul class="point-list">
+        <li>Buyer is a small business owner, e-com store, or solo operator with no SEO background</li>
+        <li>Prospect is paying $299+/mo for Alli AI but not getting GEO tracking included</li>
+        <li>Buyer wants fixes applied, not just a list of what to fix</li>
+        <li>Budget is tight — Raechal's free plan or lower tiers beat everyone else</li>
+        <li>Prospect cares about showing up in ChatGPT/Perplexity answers, not just Google</li>
+        <li>Buyer is frustrated by needing a developer to implement SEO changes</li>
+        <li>Small agency or freelancer managing 1–5 sites who can't afford Alli's $599/mo</li>
+      </ul>
+    </div>
+    <div class="lose-box">
+      <h4>🔴 Watch Out When…</h4>
+      <ul class="point-list">
+        <li>Buyer needs to manage 50+ sites with bulk schema/structured data at scale (Alli AI territory)</li>
+        <li>Enterprise procurement requires SOC 2 compliance and SSO (Profound, Semrush)</li>
+        <li>Buyer is already deep in the Semrush/Adobe ecosystem and GEO is just an add-on decision</li>
+        <li>Customer needs the most comprehensive keyword/competitive research corpus (Semrush)</li>
+        <li>Prospect needs 10+ AI engine GEO coverage with real user interaction data (Profound)</li>
+        <li>AI article writing volume is the primary use case (Writesonic)</li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- /matrix -->
+
+<!-- ================================================================ -->
+<!-- TAB: RAECHAL.AI -->
+<!-- ================================================================ -->
+<div id="raechal" class="tab-panel">
+
+  <div class="battlecard-header">
+    <div>
+      <div class="comp-name" style="color: var(--accent-light);">✦ Raechal.ai</div>
+      <div class="comp-tagline">AI-powered SEO automation + GEO tracking — no expertise required</div>
+      <div class="comp-meta">
+        <span class="meta-tag">SMB / Mid-market</span>
+        <span class="meta-tag">Free plan</span>
+        <span class="meta-tag">Human-approved automation</span>
+        <span class="meta-tag">GEO included</span>
+      </div>
+    </div>
+    <span class="pill pill-win">Our Platform</span>
+  </div>
+
+  <div class="section-title">Our Core Differentiators</div>
+  <div class="section-sub">The arguments only Raechal.ai can make.</div>
+
+  <div class="grid-2 mb-20">
+    <div class="diff-card">
+      <h4>🤖 We Fix It — With Your Approval</h4>
+      <p>Every other tool tells you what's wrong and leaves the implementation to you. Raechal's AI identifies issues <em>and</em> applies the fixes. You review and approve every change before it goes live. No developer needed.</p>
+      <div class="proof">No competitor at our price point offers this. Alli AI does it too — at $299/mo minimum.</div>
+    </div>
+    <div class="diff-card">
+      <h4>📡 SEO + GEO in One Platform, Starting Free</h4>
+      <p>Raechal is the only platform combining traditional SEO automation with AI search visibility (GEO) that you can start using for free. Writesonic charges $249/mo for GEO. Profound starts at $99 with heavy restrictions.</p>
+      <div class="proof">Your brand visibility in ChatGPT, Claude, and Perplexity is tracked — alongside your Google rankings — from day one.</div>
+    </div>
+    <div class="diff-card">
+      <h4>🔧 Full-Stack Automation</h4>
+      <p>SEO audits, content updates, broken link fixes, redirects, and media management are all automated through Raechal. Most tools handle one or two of these. We handle all of them.</p>
+      <div class="proof">Profound does zero implementation. Writesonic does zero. Semrush does zero. Alli AI handles technical SEO only.</div>
+    </div>
+    <div class="diff-card">
+      <h4>👤 Built for Non-Experts</h4>
+      <p>No prior SEO knowledge required. Raechal's UI and workflows are designed for business owners, store operators, and lean marketing teams — not seasoned SEO professionals who want raw data.</p>
+      <div class="proof">Every competitor targets "SEO teams" or enterprise ops. Raechal owns the non-expert segment.</div>
+    </div>
+  </div>
+
+  <div class="section-title">Positioning Statement</div>
+  <div class="card mt-12 mb-20">
+    <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary); font-style: italic;">
+      "For business owners and small teams who don't have an SEO team, Raechal.ai is the all-in-one SEO and AI visibility platform that finds problems, fixes them with AI, and tracks how your brand appears in both Google and AI-powered search — all with your approval, starting free."
+    </p>
+  </div>
+
+  <div class="section-title">Recent Capabilities (As Researched April 2026)</div>
+  <ul class="point-list card mt-12">
+    <li style="margin-bottom:8px">GEO tracking: monitors brand mentions across ChatGPT, Claude, and Perplexity</li>
+    <li style="margin-bottom:8px">Automated SEO audit covering Core Web Vitals, backlinks, and AI visibility signals</li>
+    <li style="margin-bottom:8px">AI-generated optimizations with human-approval workflow before any change goes live</li>
+    <li style="margin-bottom:8px">Automated broken link fixes, redirect management, and media optimization</li>
+    <li style="margin-bottom:8px">Actionable growth steps personalized to the user's actual site data</li>
+    <li>Free plan entry point with tiered scaling for agencies</li>
+  </ul>
+
+</div><!-- /raechal -->
+
+<!-- ================================================================ -->
+<!-- TAB: ALLI AI -->
+<!-- ================================================================ -->
+<div id="alliai" class="tab-panel">
+
+  <div class="battlecard-header">
+    <div>
+      <div class="comp-name">Alli AI</div>
+      <div class="comp-tagline">"Deploy SEO changes sitewide in minutes — no dev required"</div>
+      <div class="comp-meta">
+        <span class="meta-tag">alliai.com</span>
+        <span class="meta-tag">Agency / Multi-site</span>
+        <span class="meta-tag">$299/mo+</span>
+        <span class="meta-tag">Est. ~2018</span>
+      </div>
+    </div>
+    <span class="pill pill-win">We Win</span>
+  </div>
+
+  <div class="win-lose-grid">
+    <div class="win-box">
+      <h4>🟢 Raechal Wins Here</h4>
+      <ul class="point-list">
+        <li>GEO / AI visibility tracking — Alli has zero GEO features</li>
+        <li>Free plan — Alli requires $299/mo minimum (10-day trial only)</li>
+        <li>Non-expert accessibility — Alli targets technical SEOs</li>
+        <li>Content updates + media management automation</li>
+        <li>Single-site owners and small businesses priced out of Alli</li>
+        <li>All-in-one audit + fix + GEO in one platform</li>
+      </ul>
+    </div>
+    <div class="lose-box">
+      <h4>🔴 Alli Wins Here</h4>
+      <ul class="point-list">
+        <li>Bulk operations at scale: 5,000 pages, 15 sites simultaneously</li>
+        <li>CMS-agnostic deployment is genuinely battle-tested</li>
+        <li>SEO A/B testing for page titles — Raechal doesn't offer this</li>
+        <li>Schema markup generation at scale</li>
+        <li>Stronger G2/Capterra review volume — established trust</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title mt-24">Pricing Intelligence</div>
+  <div class="pricing-grid mt-12">
+    <div class="pricing-card">
+      <div class="tier">Business</div>
+      <div class="price">$299<span style="font-size:14px;font-weight:400;color:var(--text-muted)">/mo</span></div>
+      <div class="price-note">5 sites · 500 keywords · 1,250 pages</div>
+    </div>
+    <div class="pricing-card">
+      <div class="tier">Agency</div>
+      <div class="price">$599<span style="font-size:14px;font-weight:400;color:var(--text-muted)">/mo</span></div>
+      <div class="price-note">15 sites · 2,000 keywords · 5,000 pages</div>
+    </div>
+    <div class="pricing-card">
+      <div class="tier">Enterprise</div>
+      <div class="price">Custom</div>
+      <div class="price-note">Sales-led</div>
+    </div>
+  </div>
+  <div class="pricing-trap mt-12">
+    <strong>Pricing trap to call out:</strong> Alli AI charges $299/mo just to get started — with no GEO features at any tier. A customer paying $299/mo with Alli still has zero insight into how they appear in ChatGPT or Perplexity answers.
+  </div>
+
+  <div class="section-title mt-24">Talk Tracks</div>
+
+  <div class="talk-track mt-12">
+    <div class="talk-track-header" onclick="toggleTrack(this)">
+      <span>Prospect is currently using Alli AI</span>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="talk-track-body">
+      <p class="scenario-label">Displacement Strategy</p>
+      <p>"Great — Alli is solid for bulk technical deployments. A couple of questions: are you currently tracking how your brand shows up in ChatGPT or Perplexity answers? And are you managing content updates, broken links, and redirects through Alli, or through separate tools? Because Raechal handles all of that in one place — and starts at a fraction of Alli's price."</p>
+    </div>
+  </div>
+
+  <div class="talk-track">
+    <div class="talk-track-header" onclick="toggleTrack(this)">
+      <span>Prospect mentions Alli AI in an evaluation</span>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="talk-track-body">
+      <p class="scenario-label">Competitive Positioning</p>
+      <p>"Alli is a great tool for agencies managing lots of sites. Where it has a gap is AI search visibility — it has no GEO tracking whatsoever. As AI search continues to grow, that's going to become a bigger problem. Raechal covers your traditional SEO automation <em>and</em> tracks your brand visibility in AI engines — without requiring a $299/mo commitment just to get started."</p>
+    </div>
+  </div>
+
+  <div class="talk-track">
+    <div class="talk-track-header" onclick="toggleTrack(this)">
+      <span>Prospect asking "do you do bulk operations like Alli?"</span>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="talk-track-body">
+      <p class="scenario-label">Handling the Capability Question</p>
+      <p>"Yes — Raechal automates SEO audits, content updates, broken link fixes, redirects, and media management. If you're running 50+ sites with thousands of pages and need A/B testing for meta titles at scale, that's where Alli's bulk engine is specifically built for. But for most businesses managing under 10 sites, Raechal handles everything you need — with GEO tracking on top — at a much lower cost."</p>
+    </div>
+  </div>
+
+  <div class="section-title mt-24">Objection Handling</div>
+  <table class="obj-table mt-12">
+    <thead>
+      <tr><th>Prospect says…</th><th>Respond with…</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>"Alli AI has more reviews and is more established."</td>
+        <td>Alli has been around since ~2018, which is great validation for bulk SEO deployment. But Raechal is built for where SEO is going — GEO and AI search visibility — which Alli doesn't touch. You'd need to pay Alli $299/mo and then pay a separate GEO tool on top.</td>
+      </tr>
+      <tr>
+        <td>"We need to manage 15 sites — Alli's agency plan handles that."</td>
+        <td>Absolutely, and at $599/mo you get great bulk capabilities. What's your budget for AI visibility tracking on top of that? With Raechal, both are included, and our agency tier is considerably more accessible.</td>
+      </tr>
+      <tr>
+        <td>"We need SEO A/B testing for page titles."</td>
+        <td>That's a specific feature Alli has built out well. It's on our roadmap. If that's the deciding factor, Alli is the right call for you today. That said, we'd include GEO tracking that Alli won't have any time soon.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title mt-24">🎯 Landmine Questions</div>
+  <div class="landmine-list mt-12">
+    <div class="landmine">
+      <strong>Expose the GEO gap</strong>
+      "Are you currently tracking how often your brand gets cited in ChatGPT or Perplexity answers? How important is AI search visibility to your growth strategy over the next 12 months?"
+    </div>
+    <div class="landmine">
+      <strong>Expose the price sensitivity</strong>
+      "What does your current Alli AI plan cost per month? And how many sites are you actually using it on? Are you using all the capacity in your plan?"
+    </div>
+    <div class="landmine">
+      <strong>Expose the content gap</strong>
+      "When Alli surfaces a content issue — like an outdated page or a thin piece — what tool are you using to actually update it? How many tools are in your SEO workflow today?"
+    </div>
+  </div>
+
+</div><!-- /alliai -->
+
+<!-- ================================================================ -->
+<!-- TAB: WRITESONIC -->
+<!-- ================================================================ -->
+<div id="writesonic" class="tab-panel">
+
+  <div class="battlecard-header">
+    <div>
+      <div class="comp-name">Writesonic</div>
+      <div class="comp-tagline">"AI Search Visibility Tracking & Optimization Platform"</div>
+      <div class="comp-meta">
+        <span class="meta-tag">writesonic.com</span>
+        <span class="meta-tag">VC-funded, Series A+</span>
+        <span class="meta-tag">$49–$249/mo</span>
+        <span class="meta-tag">Content + SEO + GEO</span>
+      </div>
+    </div>
+    <span class="pill pill-win">We Win on Automation</span>
+  </div>
+
+  <div class="win-lose-grid">
+    <div class="win-box">
+      <h4>🟢 Raechal Wins Here</h4>
+      <ul class="point-list">
+        <li>Automated implementation — Writesonic gives recommendations, Raechal applies fixes</li>
+        <li>Free plan — Writesonic requires $49/mo minimum, $249/mo for GEO</li>
+        <li>Technical SEO automation: Core Web Vitals, broken links, redirects, media</li>
+        <li>Non-expert workflow — Writesonic is marketer/writer-centric, assumes sophistication</li>
+        <li>Lower total cost to access GEO features</li>
+      </ul>
+    </div>
+    <div class="lose-box">
+      <h4>🔴 Writesonic Wins Here</h4>
+      <ul class="point-list">
+        <li>Broader GEO engine coverage: 10+ engines at Pro tier ($249/mo)</li>
+        <li>Built-in AI article writing (high-volume content production)</li>
+        <li>Strong brand recognition and content marketing reach</li>
+        <li>Integration with Google, Ahrefs, and Semrush data</li>
+        <li>Citation gap analysis with ready-made outreach emails</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title mt-24">Pricing Intelligence</div>
+  <div class="pricing-grid mt-12">
+    <div class="pricing-card">
+      <div class="tier">Lite</div>
+      <div class="price">$49<span style="font-size:14px;font-weight:400;color:var(--text-muted)">/mo</span></div>
+      <div class="price-note">No GEO features</div>
+    </div>
+    <div class="pricing-card">
+      <div class="tier">Professional</div>
+      <div class="price">$249<span style="font-size:14px;font-weight:400;color:var(--text-muted)">/mo</span></div>
+      <div class="price-note">GEO monitoring, 10+ engines</div>
+    </div>
+    <div class="pricing-card">
+      <div class="tier">Enterprise</div>
+      <div class="price">Custom</div>
+      <div class="price-note">Complex/global needs</div>
+    </div>
+  </div>
+  <div class="pricing-trap mt-12">
+    <strong>Key pricing trap:</strong> Writesonic's entry tier ($49/mo) has NO GEO features. Customers are pulled in at $49 and then upsold to $249 — a 5× price jump — to get AI visibility tracking. Ask prospects: "What plan are you on, and does it include GEO?"
+  </div>
+
+  <div class="section-title mt-24">Talk Tracks</div>
+
+  <div class="talk-track mt-12">
+    <div class="talk-track-header" onclick="toggleTrack(this)">
+      <span>Prospect is evaluating Writesonic for SEO + GEO</span>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="talk-track-body">
+      <p class="scenario-label">Head-to-Head Positioning</p>
+      <p>"Writesonic is a strong content and visibility platform. Two questions worth asking in your eval: First, which plan includes GEO tracking — because the entry plan at $49 doesn't have it; you'd need $249/mo. Second, when it flags an SEO issue on your site — a broken link, a slow page, an outdated meta description — how does it fix it? Writesonic gives you the list. Raechal applies the fix, with your approval, automatically."</p>
+    </div>
+  </div>
+
+  <div class="talk-track">
+    <div class="talk-track-header" onclick="toggleTrack(this)">
+      <span>Prospect says "we mainly need content writing"</span>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="talk-track-body">
+      <p class="scenario-label">When Writing Volume is the Need</p>
+      <p>"If high-volume AI article writing is the primary use case, Writesonic is genuinely built for that — they publish a lot and have a strong writing engine. Where Raechal differs is the SEO implementation side: we don't just help you create content, we help you fix and maintain your existing site automatically. If you need both — content creation at scale AND automated SEO maintenance — that's worth factoring into the comparison."</p>
+    </div>
+  </div>
+
+  <div class="talk-track">
+    <div class="talk-track-header" onclick="toggleTrack(this)">
+      <span>Prospect already has Writesonic Lite ($49/mo)</span>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="talk-track-body">
+      <p class="scenario-label">Displacement from Entry Tier</p>
+      <p>"Good to know — so you're on the Lite plan. That means GEO tracking isn't included yet. Have you been asked about upgrading to Pro at $249/mo? Because with Raechal, you'd get automated SEO fixes <em>and</em> GEO tracking included — without the $249 jump. What's the thing you're most trying to solve right now: content creation, ranking improvements, or AI visibility?"</p>
+    </div>
+  </div>
+
+  <div class="section-title mt-24">Objection Handling</div>
+  <table class="obj-table mt-12">
+    <thead>
+      <tr><th>Prospect says…</th><th>Respond with…</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>"Writesonic tracks 10+ AI engines — more than Raechal."</td>
+        <td>That's accurate at the Pro tier ($249/mo). Raechal currently tracks ChatGPT, Claude, and Perplexity — the three highest-traffic AI search platforms. For most businesses, that's where their audience is. The difference is Raechal also implements fixes; Writesonic at any tier doesn't touch your site.</td>
+      </tr>
+      <tr>
+        <td>"Writesonic integrates with Ahrefs and Semrush."</td>
+        <td>Yes, those integrations let you pull in data you likely already pay for. If you're already a Semrush or Ahrefs customer looking for a unified dashboard, that's a real advantage. For someone who doesn't want to manage multiple tool subscriptions, Raechal is a self-contained solution.</td>
+      </tr>
+      <tr>
+        <td>"Writesonic has a much bigger brand and community."</td>
+        <td>Writesonic definitely has strong content reach — they rank well because they publish constantly. That said, brand size doesn't change the core question: do you want a tool that generates recommendations, or one that applies the fixes?</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title mt-24">🎯 Landmine Questions</div>
+  <div class="landmine-list mt-12">
+    <div class="landmine">
+      <strong>Expose the pricing trap</strong>
+      "Which Writesonic plan are you looking at? Have you confirmed whether GEO tracking is included at that tier, or if it requires the $249/mo Professional plan?"
+    </div>
+    <div class="landmine">
+      <strong>Expose the implementation gap</strong>
+      "When Writesonic identifies an SEO issue on your site — say, a broken link or a slow-loading page — how does it get fixed? Who does that work today?"
+    </div>
+    <div class="landmine">
+      <strong>Expose the tool sprawl</strong>
+      "How many tools are currently in your SEO and content workflow? How much time does your team spend moving between them each week?"
+    </div>
+  </div>
+
+</div><!-- /writesonic -->
+
+<!-- ================================================================ -->
+<!-- TAB: SEMRUSH / ADOBE -->
+<!-- ================================================================ -->
+<div id="semrush" class="tab-panel">
+
+  <div class="battlecard-header">
+    <div>
+      <div class="comp-name">Semrush / Adobe</div>
+      <div class="comp-tagline">"The #1 online visibility management platform" — acquired by Adobe for $1.9B (2025)</div>
+      <div class="comp-meta">
+        <span class="meta-tag">semrush.com</span>
+        <span class="meta-tag">Public → Adobe subsidiary</span>
+        <span class="meta-tag">$130–$500/mo+</span>
+        <span class="meta-tag">Enterprise</span>
+      </div>
+    </div>
+    <span class="pill pill-win">We Win on SMB</span>
+  </div>
+
+  <div class="alert">
+    <strong>Major market development:</strong> Adobe acquired Semrush for $1.9B in 2025. This signals the GEO era is mainstream — but also means Semrush's roadmap will increasingly serve Adobe Experience Cloud enterprise customers, potentially leaving SMBs behind.
+  </div>
+
+  <div class="win-lose-grid">
+    <div class="win-box">
+      <h4>🟢 Raechal Wins Here</h4>
+      <ul class="point-list">
+        <li>Accessible price — Semrush starts at $130+/mo; GEO is an additional add-on cost</li>
+        <li>No expertise required — Semrush has a steep learning curve</li>
+        <li>Automated implementation — Semrush surfaces insights only, never touches your site</li>
+        <li>Free plan — Semrush has no free tier</li>
+        <li>SMB and non-expert market — Semrush is built for enterprise SEO teams</li>
+        <li>Unified SEO + GEO without stitching two products together</li>
+      </ul>
+    </div>
+    <div class="lose-box">
+      <h4>🔴 Semrush Wins Here</h4>
+      <ul class="point-list">
+        <li>Data depth: 26.5 billion keywords, 43 trillion backlinks — unmatched</li>
+        <li>Adobe ecosystem integration for large enterprise marketing stacks</li>
+        <li>Brand trust: "safe" enterprise procurement choice</li>
+        <li>Competitive keyword and PPC research — no comparison</li>
+        <li>Content marketing audit and social listening tools</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title mt-24">Pricing Intelligence</div>
+  <div class="pricing-grid mt-12">
+    <div class="pricing-card">
+      <div class="tier">Pro</div>
+      <div class="price">~$130<span style="font-size:14px;font-weight:400;color:var(--text-muted)">/mo</span></div>
+      <div class="price-note">1 user · basic limits</div>
+    </div>
+    <div class="pricing-card">
+      <div class="tier">Guru</div>
+      <div class="price">~$250<span style="font-size:14px;font-weight:400;color:var(--text-muted)">/mo</span></div>
+      <div class="price-note">3 users · historical data</div>
+    </div>
+    <div class="pricing-card">
+      <div class="tier">Business</div>
+      <div class="price">~$500<span style="font-size:14px;font-weight:400;color:var(--text-muted)">/mo</span></div>
+      <div class="price-note">5 users · API access</div>
+    </div>
+    <div class="pricing-card">
+      <div class="tier">AI Visibility Add-on</div>
+      <div class="price">+$$$</div>
+      <div class="price-note">Separate cost on top</div>
+    </div>
+  </div>
+  <div class="pricing-trap mt-12">
+    <strong>Key pricing trap:</strong> Semrush's GEO tracking (AI Visibility Toolkit) is an add-on to an already expensive subscription. A customer needs to be paying Semrush AND then add on AI visibility separately. Ask: "What's the all-in cost for Semrush + the GEO add-on?"
+  </div>
+
+  <div class="section-title mt-24">Talk Tracks</div>
+
+  <div class="talk-track mt-12">
+    <div class="talk-track-header" onclick="toggleTrack(this)">
+      <span>Prospect uses Semrush and is curious about GEO</span>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="talk-track-body">
+      <p class="scenario-label">Add-on Expansion</p>
+      <p>"Semrush is the gold standard for keyword research and competitive intelligence — it's probably not going anywhere in your stack. The question is whether you want to add Semrush's GEO toolkit (at additional cost) or get automated SEO implementation AND GEO tracking in one tool at a fraction of the price. Raechal can complement Semrush for the execution layer — we apply fixes that Semrush's reports surface."</p>
+    </div>
+  </div>
+
+  <div class="talk-track">
+    <div class="talk-track-header" onclick="toggleTrack(this)">
+      <span>Prospect is evaluating Semrush as a new customer</span>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="talk-track-body">
+      <p class="scenario-label">SMB Value Positioning</p>
+      <p>"Semrush is a great tool if you have an SEO team that can interpret the data and implement the recommendations. At $130+/mo, you're paying for one of the deepest SEO data platforms in the world. But it doesn't implement anything — it just tells you what to do. If you don't have a dedicated SEO person, you may end up with an expensive list of problems and no time to fix them. Raechal audits your site, prioritizes the fixes, and applies them — with your approval."</p>
+    </div>
+  </div>
+
+  <div class="section-title mt-24">Objection Handling</div>
+  <table class="obj-table mt-12">
+    <thead>
+      <tr><th>Prospect says…</th><th>Respond with…</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>"Everyone uses Semrush. It's the standard."</td>
+        <td>It is the standard — for SEO research and data. What most people don't realize is Semrush doesn't make any changes to your site. It's a reporting and research tool. Raechal is the execution layer. Many teams use both.</td>
+      </tr>
+      <tr>
+        <td>"Adobe backing means Semrush is going to be much more powerful."</td>
+        <td>Adobe's acquisition validates GEO as a critical market — great signal. But Adobe's roadmap will prioritize Adobe Experience Cloud enterprise customers. If you're not a Fortune 500 with an Adobe stack, you may find Semrush's roadmap serving a different customer than you over the next 2–3 years.</td>
+      </tr>
+      <tr>
+        <td>"We already pay for Semrush — we don't want another SEO tool."</td>
+        <td>Totally fair. Worth asking: are you currently getting value from all of Semrush's recommendations? Is someone on your team implementing the fixes it surfaces? Raechal can work alongside Semrush as the implementation layer — taking what Semrush finds and automatically applying the fixes.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title mt-24">🎯 Landmine Questions</div>
+  <div class="landmine-list mt-12">
+    <div class="landmine">
+      <strong>Expose the implementation gap</strong>
+      "When Semrush surfaces an issue — a slow page, a broken link, a thin meta description — who on your team is responsible for implementing the fix? How long does it typically take?"
+    </div>
+    <div class="landmine">
+      <strong>Expose the GEO add-on cost</strong>
+      "Does your current Semrush plan include the AI Visibility Toolkit? If you added it, what would the total monthly cost be?"
+    </div>
+    <div class="landmine">
+      <strong>Expose the complexity</strong>
+      "On a scale of 1–10, how much of Semrush's functionality does your team actively use? Does everyone on your team feel comfortable navigating it?"
+    </div>
+  </div>
+
+</div><!-- /semrush -->
+
+<!-- ================================================================ -->
+<!-- TAB: PROFOUND -->
+<!-- ================================================================ -->
+<div id="profound" class="tab-panel">
+
+  <div class="battlecard-header">
+    <div>
+      <div class="comp-name">Profound</div>
+      <div class="comp-tagline">"The enterprise GEO platform for AI visibility"</div>
+      <div class="comp-meta">
+        <span class="meta-tag">tryprofound.com</span>
+        <span class="meta-tag">VC-funded</span>
+        <span class="meta-tag">$99–$399/mo+ (Enterprise)</span>
+        <span class="meta-tag">SOC 2 Type II</span>
+      </div>
+    </div>
+    <span class="pill pill-win">We Win on Breadth + Price</span>
+  </div>
+
+  <div class="win-lose-grid">
+    <div class="win-box">
+      <h4>🟢 Raechal Wins Here</h4>
+      <ul class="point-list">
+        <li>Traditional SEO — Profound has zero SEO features, auditing, or implementation</li>
+        <li>Automated site fixes — Profound is purely a monitoring and content platform</li>
+        <li>Price accessibility — Profound's useful entry point is $399/mo; Raechal is free</li>
+        <li>Full coverage from one tool: audit → fix → track in one workflow</li>
+        <li>SMB and mid-market — Profound explicitly targets Fortune 500 enterprise</li>
+        <li>No compliance/procurement overhead (SOC 2 not required for most buyers)</li>
+      </ul>
+    </div>
+    <div class="lose-box">
+      <h4>🔴 Profound Wins Here</h4>
+      <ul class="point-list">
+        <li>Real user interaction data — more accurate than synthetic GEO queries</li>
+        <li>"Conversation Explorer" — unique visibility into AI search volume trends</li>
+        <li>Enterprise compliance: SOC 2 Type II, SSO, AWS/Cloudflare/Vercel integrations</li>
+        <li>Broadest engine coverage at high tiers (10+ AI platforms at Enterprise)</li>
+        <li>Thought leadership and analyst credibility in the GEO category</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title mt-24">Pricing Intelligence</div>
+  <div class="pricing-grid mt-12">
+    <div class="pricing-card">
+      <div class="tier">Starter</div>
+      <div class="price">$99<span style="font-size:14px;font-weight:400;color:var(--text-muted)">/mo</span></div>
+      <div class="price-note">Very limited functionality</div>
+    </div>
+    <div class="pricing-card">
+      <div class="tier">Growth</div>
+      <div class="price">$399<span style="font-size:14px;font-weight:400;color:var(--text-muted)">/mo</span></div>
+      <div class="price-note">3 AI engines only (ChatGPT, Perplexity, AI Overviews)</div>
+    </div>
+    <div class="pricing-card">
+      <div class="tier">Enterprise</div>
+      <div class="price">Custom</div>
+      <div class="price-note">10+ engines, SSO, SOC 2</div>
+    </div>
+  </div>
+  <div class="pricing-trap mt-12">
+    <strong>Key pricing trap:</strong> Profound's Growth plan ($399/mo) only covers 3 AI platforms. Full coverage (Claude, Grok, Gemini, Meta AI, DeepSeek, etc.) requires the custom Enterprise tier — meaning the $399 advertised price is not what most enterprise buyers pay in practice.
+  </div>
+
+  <div class="section-title mt-24">Talk Tracks</div>
+
+  <div class="talk-track mt-12">
+    <div class="talk-track-header" onclick="toggleTrack(this)">
+      <span>Prospect is evaluating Profound for GEO tracking</span>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="talk-track-body">
+      <p class="scenario-label">Value vs. Enterprise Depth</p>
+      <p>"Profound is excellent for enterprise teams that need defensible data and compliance features. Two questions: Do you need SOC 2 and SSO for procurement? And are you also solving for traditional SEO, or just AI visibility? Because Profound does only GEO — it doesn't audit your site, fix broken links, or touch your rankings in Google. Raechal covers both sides at a fraction of the price."</p>
+    </div>
+  </div>
+
+  <div class="talk-track">
+    <div class="talk-track-header" onclick="toggleTrack(this)">
+      <span>Prospect says "Profound has the best GEO data"</span>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="talk-track-body">
+      <p class="scenario-label">Data Quality Discussion</p>
+      <p>"Profound's 'Conversation Explorer' using real front-end interaction data is genuinely impressive — it's a differentiator for teams running enterprise GEO programs. For most businesses, the question is whether that level of data precision justifies $399–$thousands per month just for GEO monitoring, when you still have no solution for the rest of your SEO. Raechal gives you actionable GEO visibility plus a fully automated SEO maintenance layer."</p>
+    </div>
+  </div>
+
+  <div class="section-title mt-24">Objection Handling</div>
+  <table class="obj-table mt-12">
+    <thead>
+      <tr><th>Prospect says…</th><th>Respond with…</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>"Profound is the market leader in GEO."</td>
+        <td>Profound has strong positioning in enterprise GEO monitoring — that's fair. They do zero traditional SEO, zero site fixes, and their entry price ($399/mo) only covers 3 AI engines. If you're a Fortune 500 with a dedicated marketing ops team and compliance requirements, it makes sense. For most businesses, it's overkill for the GEO piece alone.</td>
+      </tr>
+      <tr>
+        <td>"We need real user interaction data, not synthetic queries."</td>
+        <td>Profound's methodology is genuinely differentiated for that use case. It matters most when you're running large-scale GEO programs where data accuracy drives content investment decisions at scale. At that level of sophistication, Profound is a strong choice. At the SMB and mid-market level, the delta between their data and others' is much smaller than the $399–$thousands pricing delta.</td>
+      </tr>
+      <tr>
+        <td>"We need SOC 2 and SSO for compliance."</td>
+        <td>If enterprise compliance requirements are non-negotiable, Profound or Semrush may be the right fit. Worth confirming: is SOC 2 a hard requirement from procurement, or a preference? Many teams in the mid-market don't actually have that as a strict requirement.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title mt-24">🎯 Landmine Questions</div>
+  <div class="landmine-list mt-12">
+    <div class="landmine">
+      <strong>Expose the SEO gap</strong>
+      "Does your team have a separate tool for traditional SEO — auditing, technical fixes, backlinks, redirects? How many tools would you be running alongside Profound to cover everything?"
+    </div>
+    <div class="landmine">
+      <strong>Expose the pricing reality</strong>
+      "At Profound's Growth plan, you're monitoring 3 AI engines. Which additional engines do you need coverage on — Claude, Grok, Gemini, Meta AI? Have you asked them what full coverage would cost?"
+    </div>
+    <div class="landmine">
+      <strong>Expose the no-implementation gap</strong>
+      "When Profound's data shows your brand isn't being cited in AI answers — what's the next step? Who creates the content changes, and who deploys them to your site?"
+    </div>
+  </div>
+
+</div><!-- /profound -->
+
+</div><!-- /content -->
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>Raechal.ai Competitive Battlecard · Research conducted April 18, 2026 · Update monthly or before major deals</p>
+  <p>Competitor data from public sources · Verify pricing before sales conversations</p>
+</div>
+
+<script>
+  function switchTab(id, btn) {
+    // Deactivate all panels and buttons
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+    // Activate selected
+    document.getElementById(id).classList.add('active');
+
+    // Find the button if not passed directly
+    if (!btn || !btn.classList) {
+      const allBtns = document.querySelectorAll('.tab-btn');
+      allBtns.forEach(b => {
+        if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + id + "'")) {
+          b.classList.add('active');
+        }
+      });
+    } else {
+      btn.classList.add('active');
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleTrack(header) {
+    const body = header.nextElementSibling;
+    const chevron = header.querySelector('.chevron');
+    const isOpen = body.classList.contains('open');
+
+    body.classList.toggle('open', !isOpen);
+    chevron.classList.toggle('open', !isOpen);
+  }
+</script>
+
+</body>
+</html>
